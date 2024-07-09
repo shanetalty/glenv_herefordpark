@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Video Switcher</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="color-scheme" content="dark light">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: black; /* Set the background color to black */
+    }
+    
+    #video-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      transition: opacity 0.5s ease; /* Add transition for opacity */
+    }
+  </style>
+</head>
+<body>
+  <div id="video-container">
+    <video id="video1" src="video1.mp4" onended="video1Ended()"></video>
+    <video id="video2" src="video2.mp4" loop onended="video2Ended()"></video>
+  </div>
+
+  <script>
+    const video1 = document.getElementById('video1');
+    const video2 = document.getElementById('video2');
+    let currentVideo = 1;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.body.addEventListener('click', function(event) {
+        const { clientX, clientY } = event;
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+
+        if (clientX > screenWidth / 2 && clientY < screenHeight / 2) {
+          // Top right quadrant
+          switchVideoWithFade();
+        } else if (clientX < screenWidth / 2 && clientY < screenHeight / 2) {
+          // Top left quadrant
+          restartVideo();
+        }
+      });
+    });
+
+    function switchVideoWithFade() {
+      if (currentVideo === 1) {
+        fadeOut(video1);
+        fadeIn(video2);
+        video1.currentTime = 0;
+        video2.currentTime = 0;
+        currentVideo = 2;
+      } else {
+        fadeOut(video2);
+        fadeIn(video1);
+        video1.currentTime = 0;
+        video2.currentTime = 0;
+        currentVideo = 1;
+      }
+    }
+
+    function restartVideo() {
+      if (currentVideo === 1) {
+        video1.currentTime = 0;
+      } else {
+        video2.currentTime = 0;
+      }
+    }
+
+    function video1Ended() {
+      video1.pause();
+    }
+
+    function video2Ended() {
+      video2.pause();
+    }
+
+    function fadeOut(element) {
+      element.style.opacity = 0;
+      setTimeout(() => {
+        element.pause();
+      }, 500); // Pause the video after the fade out transition (0.5s)
+    }
+
+    function fadeIn(element) {
+      element.play();
+      element.style.opacity = 1;
+    }
+  </script>
+</body>
+</html>
